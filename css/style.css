@@ -72,11 +72,11 @@ h5 {
 }
 
 h6 {
-	font-size: 20px;
+	font-size: 19px;
 }
 
 p {
-	font-size: 17px;
+	font-size: 15.5px;
 	font-family: "Poppins", sans-serif;
 	color: #707070;
 	font-weight: 400;
@@ -1346,12 +1346,12 @@ ol {
 }
 
 .footer__about .footer__social a {
-	font-size: 22px;
+	font-size: 20px;
 	color: #ffffff;
 	-webkit-transition: all, 0.3s;
 	-o-transition: all, 0.3s;
 	transition: all, 0.3s;
-	margin-right: 30px;
+	margin-right: 25px;
 }
 
 .footer__about .footer__social a:hover {
@@ -1378,7 +1378,7 @@ ol {
 }
 
 .footer__widget ul li a {
-	font-size: 17px;
+	font-size: 15.5px;
 	color: #707070;
 	line-height: 36px;
 }
@@ -3066,3 +3066,7 @@ ol {
 		font-size: 32px;
 	}
 }
+
+
+
+
