@@ -18,13 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const SHAKE_DURATION = 500; // milliseconds
     const SHAKE_INTERVAL_DELAY = 2000; // milliseconds (2 seconds)
     // const SHRINK_DELAY = 6000; // Original shrink delay, we'll use COLLAPSE_DELAY instead for auto-collapse
-    const COLLAPSE_DELAY = 5000; // milliseconds (3 seconds) for auto-collapse
+    const COLLAPSE_DELAY = 10000; // milliseconds (3 seconds) for auto-collapse
     const TOUCH_HOLD_DELAY = 350; // milliseconds for touch hold to expand
+
+    // Define the desktop breakpoint. This should match your CSS media query.
+    const DESKTOP_BREAKPOINT = 768;
 
     // Function to add the 'collapsed' class and start shaking (if applicable)
     function collapseButtonAndStartShaking() {
-        // Only collapse if the form is NOT open and the container is NOT permanently hidden
-        if (!inquiryContainer.classList.contains('active') && !inquiryContainer.classList.contains('hidden')) {
+        // Only collapse if the form is NOT open, the container is NOT permanently hidden,
+        // AND it's a mobile screen size.
+        if (window.innerWidth <= DESKTOP_BREAKPOINT && !inquiryContainer.classList.contains('active') && !inquiryContainer.classList.contains('hidden')) {
             toggleButton.classList.add('collapsed'); // Use 'collapsed' class
             startShaking(); // Shaking can still apply to the collapsed button
         }
@@ -40,8 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function startShaking() {
         stopShaking(); // Clear any existing shake interval first
         shakeInterval = setInterval(() => {
-            // Only shake if the button is collapsed and the form is not active
-            if (toggleButton.classList.contains('collapsed') && !inquiryContainer.classList.contains('active')) {
+            // Shake if the button is not active (form not open)
+            // This applies to both collapsed (mobile) and wide (desktop/mobile uncollapsed) states.
+            if (!inquiryContainer.classList.contains('active')) {
                 toggleButton.classList.add('shake-animation');
                 setTimeout(() => {
                     toggleButton.classList.remove('shake-animation');
@@ -59,7 +64,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to reset the collapse timer (will cause it to collapse after delay if not interacted with)
     function resetCollapseTimer() {
         clearTimeout(collapseTimer);
-        collapseTimer = setTimeout(collapseButtonAndStartShaking, COLLAPSE_DELAY);
+        // Only set the timer if on a mobile screen
+        if (window.innerWidth <= DESKTOP_BREAKPOINT) {
+            collapseTimer = setTimeout(collapseButtonAndStartShaking, COLLAPSE_DELAY);
+        }
     }
 
     // Function to toggle the visibility of the inquiry form popup
@@ -72,6 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // If form is closed, reset collapse timer (will collapse after delay)
             resetCollapseTimer();
+            // Start shaking immediately when the form closes, regardless of desktop/mobile,
+            // as per new requirement for desktop shake.
+            startShaking();
         }
     }
 
@@ -115,16 +126,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Desktop Hover Effects (integrated with auto-collapse logic)
     // Check for window width to apply hover effects only on desktop-like screens
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > DESKTOP_BREAKPOINT) { // Use the same breakpoint
         toggleButton.addEventListener('mouseenter', function() {
             clearTimeout(collapseTimer); // Stop pending collapse
             expandButtonAndStopShaking(); // Ensure expanded and shaking stops
         });
 
         toggleButton.addEventListener('mouseleave', function() {
-            // Only re-start collapse timer if the form is not open
+            // On desktop, the button should remain expanded.
+            // If form is closed, re-start shaking when mouse leaves.
             if (!inquiryContainer.classList.contains('active')) {
-                resetCollapseTimer(); // Resume auto-collapse after delay
+                startShaking(); // Start shaking again
             }
         });
     }
@@ -132,8 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mobile Touch Hold to Expand
     toggleButton.addEventListener('touchstart', function(event) {
-        // Only start hold if not already active (form not open)
-        if (!inquiryContainer.classList.contains('active')) {
+        // Only start hold if on mobile and not already active (form not open)
+        if (window.innerWidth <= DESKTOP_BREAKPOINT && !inquiryContainer.classList.contains('active')) {
             touchHoldTimeout = setTimeout(() => {
                 isHolding = true; // Mark as holding
                 toggleButton.classList.add('expanded-mobile'); // Add class to expand visually
@@ -149,9 +161,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isHolding) {
             // If a hold was detected, collapse back after touch ends, unless form is now opened
-            if (!inquiryContainer.classList.contains('active')) {
+            // And only if on mobile.
+            if (window.innerWidth <= DESKTOP_BREAKPOINT && !inquiryContainer.classList.contains('active')) {
                 toggleButton.classList.remove('expanded-mobile'); // Remove visual expansion
                 resetCollapseTimer(); // Restart auto-collapse
+                startShaking(); // Re-start shaking for mobile uncollapsed state
             }
             isHolding = false; // Reset hold flag
             // Prevent subsequent click event from firing immediately if a hold just ended
@@ -164,9 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(touchHoldTimeout);
         touchHoldTimeout = null;
         if (isHolding) {
-            if (!inquiryContainer.classList.contains('active')) {
+            if (window.innerWidth <= DESKTOP_BREAKPOINT && !inquiryContainer.classList.contains('active')) {
                 toggleButton.classList.remove('expanded-mobile');
                 resetCollapseTimer();
+                startShaking(); // Re-start shaking for mobile uncollapsed state
             }
             isHolding = false;
             event.preventDefault();
@@ -199,11 +214,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Initial call to start the collapse timer when the page loads
-    // This replaces the old `resetShrinkTimer()` for initial load.
+    // Initial call to start shaking when the page loads
     window.addEventListener('load', () => {
-        collapseTimer = setTimeout(() => {
-            collapseButtonAndStartShaking();
-        }, COLLAPSE_DELAY);
+        // Start shaking on load for both desktop and mobile (if not hidden/active)
+        if (!inquiryContainer.classList.contains('active') && !inquiryContainer.classList.contains('hidden')) {
+            startShaking();
+        }
+
+        // If on mobile, also start the collapse timer
+        if (window.innerWidth <= DESKTOP_BREAKPOINT) {
+            collapseTimer = setTimeout(() => {
+                collapseButtonAndStartShaking();
+            }, COLLAPSE_DELAY);
+        }
+    });
+
+
+    // Add an event listener for window resize to handle responsiveness
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > DESKTOP_BREAKPOINT) {
+            // If resized to desktop, ensure button is expanded and start shaking
+            expandButtonAndStopShaking(); // Ensures it's wide and stops any pending mobile collapse
+            clearTimeout(collapseTimer); // Clear mobile collapse timer
+            toggleButton.classList.remove('expanded-mobile'); // Ensure this class is removed on desktop
+            if (!inquiryContainer.classList.contains('active') && !inquiryContainer.classList.contains('hidden')) {
+                startShaking(); // Start shaking for desktop
+            }
+        } else {
+            // If resized to mobile, and form is not active, re-start collapse timer and shaking
+            if (!inquiryContainer.classList.contains('active') && !inquiryContainer.classList.contains('hidden')) {
+                resetCollapseTimer(); // Re-enable auto-collapse for mobile
+                startShaking(); // Continue shaking for mobile (both collapsed and uncollapsed states)
+            }
+        }
     });
 });
