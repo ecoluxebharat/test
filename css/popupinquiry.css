@@ -209,7 +209,7 @@ body {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    padding: 20px;
+    padding: 20px; /* This padding applies to the whole content area */
     width: 300px; /* Fixed width for the form */
     max-height: 400px; /* Max height to allow scrolling if form is long */
     overflow-y: auto; /* Enable vertical scrolling for form content if it overflows */
@@ -280,34 +280,89 @@ body {
     font-size: 0.9em;
 }
 
-.inquiry-form-content input[type="text"],
+/* Styles for the row containing Name and Number */
+.inquiry-form-content .form-row {
+    display: flex;
+    justify-content: space-between; /* Distributes space between items */
+    margin-bottom: 15px; /* Spacing below the row */
+}
+
+.inquiry-form-content .form-row input[type="text"] {
+    /* Each input takes 50% of the container width minus half of the desired gap.
+       This, combined with box-sizing: border-box, ensures perfect alignment.
+    */
+    width: calc(50% - 7.5px);
+    margin-bottom: 0; /* Remove individual bottom margin */
+    box-sizing: border-box; /* Crucial: includes padding and border in the element's total width */
+    padding: 10px; /* Add padding to inputs */
+    border: 1px solid #ddd; /* Add border to inputs */
+    border-radius: 20px; /* Apply 20px border-radius as per the image */
+    font-size: 0.9em;
+}
+
 .inquiry-form-content input[type="email"],
 .inquiry-form-content textarea {
-    width: calc(100% - 22px); /* Full width minus padding and border */
+    width: 100%; /* Should take full width of the parent (after parent's padding) */
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 20px; /* Apply 20px border-radius as per the image */
     font-size: 0.9em;
+    box-sizing: border-box; /* Crucial: includes padding and border in the element's total width and height */
+}
+
+.inquiry-form-content form {
+    position: relative;
 }
 
 .inquiry-form-content textarea {
     resize: vertical; /* Allows vertical resizing by user */
     min-height: 80px;
+    /* Adjusted padding-bottom to ensure enough space for the button inside */
+    padding-bottom: 60px;
+    margin-bottom: 0; /* Remove bottom margin to prevent extra space */
 }
 
+/* Submit button styling, now positioned inside textarea */
 .inquiry-form-content button[type="submit"] {
     background-color: #28a745; /* Green submit button */
-    color: white;
-    padding: 10px 15px;
+    color: white; /* Text color if any, though it's an icon now */
+    width: 48px; /* Adjusted width for a slightly smaller circular button */
+    height: 48px; /* Adjusted height for a slightly smaller circular button */
     border: none;
-    border-radius: 5px;
+    border-radius: 50%; /* Make the button perfectly circular */
     cursor: pointer;
-    font-size: 1em;
-    width: 100%;
+    font-size: 1em; /* Adjust font size if needed for the icon */
     transition: background-color 0.3s ease;
     outline: none; /* Removes focus outline */
+    display: flex; /* Enable flexbox for centering content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Smaller shadow for smaller button */
+
+    /* Positioning the button inside the textarea with a few pixels gap */
+    position: absolute; /* Position absolutely relative to the textarea */
+    bottom: 15px; /* Distance from the bottom edge of the textarea */
+    right: 8px; /* Distance from the right edge of the textarea */
+    z-index: 2;
+    transform: translateY(0); /* Ensure no unwanted transforms from previous rules */
+    margin: 0; /* Remove any inherited margins */
+    padding: 0; /* Remove padding as it's now a purely icon button */
 }
+
+/* Add the send icon to the submit button */
+.inquiry-form-content button[type="submit"]::after {
+    content: '';
+    display: inline-block;
+    width: 20px; /* Icon width, smaller to fit the smaller button */
+    height: 20px; /* Icon height, smaller to fit the smaller button */
+    /* SVG for the send icon, with fill color set to white */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="%23ffffff" width="128" height="128" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;}</style></defs><title>send--filled</title><path d="M27.45,15.11l-22-11a1,1,0,0,0-1.08.12,1,1,0,0,0-.33,1L6.69,15H18v2H6.69L4,26.74A1,1,0,0,0,5,28a1,1,0,0,0,.45-.11l22-11a1,1,0,0,0,0-1.78Z"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 
 .inquiry-form-content button[type="submit"]:hover {
     background-color: #218838; /* Darker green on submit button hover */
