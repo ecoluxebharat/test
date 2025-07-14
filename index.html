@@ -695,6 +695,35 @@
 </footer>
 <!-- Footer Section End -->
 
+	<!-- Inquiry Popup -->
+
+<div id="inquiryContainer" class="inquiry-container">
+    <button id="inquiryToggleButton" class="inquiry-toggle-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-message-square">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="button-text">Got a question? Ask Us.</span>
+    </button>
+    <span id="permanentCloseInquiryButton" class="permanent-close-button">&times;</span>
+    <div class="inquiry-form-content">
+        <button id="closeInquiryForm" class="close-button">&times;</button>
+        <h2>Send Us an Inquiry</h2>
+        <form id="inquiryForm" action="https://formsubmit.co/temp2temp2222@gmail.com" method="POST">
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" value="https://yourwebsite.com/thankyou.html" />
+            <input type="hidden" name="_subject" value="New Website Inquiry!" />
+            <input type="text" name="name" placeholder="Your Name" required />
+            <input type="email" name="email" placeholder="Your Email" required />
+            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<!-- Inquiry Popup End --> 
+
 <!-- Js Plugins -->
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
